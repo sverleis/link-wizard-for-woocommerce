@@ -1,0 +1,2347 @@
+/* =============================================================================
+   WordPress Color Scheme Integration
+   ============================================================================= */
+
+/* 
+ * These CSS custom properties are dynamically overridden by the WordPress admin color scheme.
+ * Default values below are fallbacks for when the dynamic injection fails.
+ * The actual colors are set via PHP based on the user's selected admin color scheme.
+ */
+:root {
+    /* WordPress Core Theme Colors - Dynamic Fallbacks */
+    --lwwc-theme-primary: #0073aa;      /* button-primary background (Fresh scheme default) */
+    --lwwc-theme-primary-bg: rgba(0, 115, 170, 0.1);
+    --lwwc-theme-ui: #2c5aa0;           /* adminmenu background (Fresh scheme default) */
+    --lwwc-theme-ui-bg: rgba(44, 90, 160, 0.1);
+    --lwwc-theme-notification: #d54e21; /* notification color (Fresh scheme default) */
+    --lwwc-theme-notification-bg: rgba(213, 78, 33, 0.1);
+    --lwwc-theme-link: #0073aa;         /* link color (consistent across schemes) */
+    --lwwc-theme-link-bg: rgba(0, 115, 170, 0.1);
+    /* Darker variants for primary and admin theme-color */
+    --lwwc-theme-primary-darker-10: #006b96; /* 10% darker than primary */
+    --lwwc-theme-primary-darker-20: #005782; /* 20% darker than primary */
+    /* Expose as wp-admin theme-color shades */
+    --wp-admin-theme-color: var(--lwwc-theme-primary);
+    --wp-admin-theme-color-darker-10: var(--lwwc-theme-primary-darker-10);
+    --wp-admin-theme-color-darker-20: var(--lwwc-theme-primary-darker-20);
+    /* Link hover state uses darker-10 by default */
+    --lwwc-theme-link-hover: var(--wp-admin-theme-color-darker-10);
+}
+
+/* 
+ * Color Scheme Extensibility:
+ * To support additional WordPress admin color schemes, you can override these custom properties:
+ * 
+ * For Blue color scheme (.wp-core-ui .button-primary { background: #0073aa; }):
+ * :root { --lwwc-theme-primary: #0073aa; --lwwc-theme-ui: #2c5aa0; }
+ * 
+ * For Coffee color scheme (.wp-core-ui .button-primary { background: #59524c; }):
+ * :root { --lwwc-theme-primary: #59524c; --lwwc-theme-ui: #46403c; }
+ * 
+ * For Midnight color scheme (.wp-core-ui .button-primary { background: #e14d43; }):
+ * :root { --lwwc-theme-primary: #e14d43; --lwwc-theme-ui: #363b3f; }
+ */
+
+/* =============================================================================
+   URL Parameter Display Styling
+   ============================================================================= */
+
+/* Button padding for all */
+.lwwc-button {
+    padding: 0.5em 1em;
+}
+
+/* Button Style System - Controls display of icons and text */
+.lwwc-button-style-icons button .dashicons,
+.lwwc-button-style-text button .dashicons,
+.lwwc-button-style-both button .dashicons {
+    vertical-align: middle !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 1em;
+}
+
+/* Icons Only: Hide text, show icons */
+.lwwc-button-style-icons .button-text {
+    display: none !important;
+}
+
+.lwwc-button-style-icons button .dashicons {
+    margin-right: 0 !important;
+}
+
+/* Text Only: Hide icons, show text */
+.lwwc-button-style-text button .dashicons {
+    display: none !important;
+}
+
+/* Both: Show icons and text (default behavior) */
+.lwwc-button-style-both .button-text {
+    display: inline !important;
+}
+
+.lwwc-button-style-both button .dashicons {
+    margin-right: 5px !important;
+}
+
+/* Button Style Settings Layout */
+.lwwc-button-style-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    align-items: start;
+    margin-top: 12px;
+}
+
+.lwwc-button-style-options {
+    min-width: 0;
+}
+
+.lwwc-button-style-radios {
+    padding: 16px 0;
+}
+
+.lwwc-button-style-radios label {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.lwwc-button-style-radios label:hover {
+    color: #0073aa;
+}
+
+.lwwc-button-style-radios input[type="radio"] {
+    margin-right: 8px;
+}
+
+.lwwc-button-style-preview {
+    background: var(--wp-admin-background-color, #fff);
+    border: 1px solid var(--wp-admin-border-color, #c3c4c7);
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.lwwc-button-style-preview h4 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.lwwc-button-style-preview .saved-link-actions-mini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.lwwc-button-style-preview .saved-link-actions-mini button {
+    font-size: 12px;
+    height: 28px;
+    padding: 2px 8px;
+    line-height: 1.4;
+    border-radius: 3px;
+}
+
+.lwwc-button-style-preview .saved-link-actions-mini button .dashicons {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 782px) {
+    .lwwc-button-style-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+/**
+ * CSS for the admin-specific functionality of the WooCommerce Link Wizard plugin.
+ *
+ * @package    Woo_Link_Wizard
+ * @subpackage Woo_Link_Wizard/assets/css
+ */
+/* Use WP admin color variables for backgrounds and borders */
+.lwwc-wrap .lwwc-wizard-box {
+    border-top: none;
+    padding: 1.5rem 2rem 2rem;
+    max-width: none; /* Use full width */
+}
+.lwwc-wrap .lwwc-wizard-box:first-of-type {
+    margin-top: 0;
+    border-top: 0;
+}
+/* Use WP subtle border color */
+.lwwc-wrap h3 {
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;
+    font-size: 1.2em;
+}
+
+/* Main Header Structure */
+.lwwc-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Align columns at the bottom */
+}
+
+.lwwc-top-main-col {
+    flex-grow: 1;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.lwwc-top-icon-col {
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.lwwc-header-icon {
+    width: 65px;
+    height: 65px;
+    margin-bottom: 12px; /* Spacing to centre it within the given area */
+}
+
+/* Theme-colored SVG icon using WordPress admin color scheme CSS custom properties */
+.lwwc-header-icon.lwwc-theme-colored {
+    color: var(--wp-admin-theme-color, #000); /* WordPress admin theme primary color with black fallback */
+}
+
+/* Responsive: smaller icon on mobile */
+@media (max-width: 782px) {
+    .lwwc-header-icon {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* Remove default WP border from tabs to use the column border instead */
+.nav-tab-wrapper,
+.wrap h2.nav-tab-wrapper,
+h1.nav-tab-wrapper {
+    border-bottom: none;
+}
+
+/* Use WP admin background color for active tab */
+.nav-tab-active,
+.nav-tab-active:hover {
+    background: var(--wp-admin-background-color, #fff);
+    border-bottom-color: var(--wp-admin-background-color, #fff);
+}
+
+/* Tab Descriptions */
+/* Use WP subtle background and border */
+.lwwc-tab-description {
+    padding: 0.5rem 1rem;
+    background: var(--wp-admin-subtle-background, #f0f8ff);
+    border: 1px solid var(--wp-admin-border-color, #cce5ff);
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+.lwwc-tab-description p { margin: 0.5em 0; }
+
+/* Search Forms */
+.lwwc-search-form { position: relative; margin-bottom: 1rem; }
+
+/* Search input wrappers need relative positioning for dropdown results */
+.lwwc-search-input-wrapper {
+    position: relative;
+}
+
+/* Ensure search section and containers have proper overflow for dropdowns */
+.lwwc-search-section {
+    position: relative;
+    overflow: visible !important;
+    grid-area: search; /* merged from duplicate block */
+}
+
+.lwwc-search-form input[type="text"] { width: 100%; }
+
+/* Page search wrapper needs relative positioning for absolute positioned results */
+#lwwc-page-search-wrapper {
+    position: relative;
+}
+
+#lwwc-page-search-input {
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+/* Button styling */
+#lwwc-open-button .dashicons {
+    vertical-align: middle;
+    margin-right: 3px;
+}
+
+#lwwc-open-button:hover .dashicons {
+    color: var(--lwwc-theme-link, #0073aa);
+}
+
+#lwwc-search-results, 
+#lwwc-search-results-checkout, 
+#lwwc-coupon-search-results, 
+#lwwc-page-search-results, 
+.lwwc-search-results {
+    position: absolute; 
+    left: 0; 
+    right: 0; 
+    background: var(--wp-admin-background-color, #fff);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); z-index: 9999; max-height: 300px; overflow-y: auto;
+}
+#lwwc-search-results ul, 
+#lwwc-search-results-checkout ul, 
+#lwwc-coupon-search-results ul, 
+#lwwc-page-search-results ul, .lwwc-search-results ul { 
+    list-style: none; 
+    margin: 0; padding: 0; 
+}
+#lwwc-search-results li, 
+#lwwc-search-results-checkout li, 
+#lwwc-coupon-search-results li, 
+#lwwc-page-search-results li, 
+.lwwc-search-results li { 
+    padding: 10px; 
+    cursor: pointer; 
+    border-bottom: 1px solid var(--wp-admin-border-color, #eee); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+#lwwc-search-results li:hover, 
+#lwwc-search-results-checkout li:hover, 
+#lwwc-coupon-search-results li:hover, 
+#lwwc-page-search-results li:hover, 
+.lwwc-search-results li:hover { 
+    background: var(--wp-admin-background-color, #f0f0f1); 
+}
+.no-results { padding: 10px; color: #777; }
+
+/* Variable product styling */
+li.is-variable { font-weight: bold; }
+li.is-variable .lwwc-product-name { flex: 1; }
+li.is-variable .lwwc-variable-label { 
+    display: inline-flex; 
+    align-items: center; 
+    background: var(--wp-admin-background-color, #f0f6fc); 
+    color: var(--wp-admin-theme-color, #0073aa); 
+    font-size: 11px; 
+    font-weight: 500; 
+    padding: 2px 6px; 
+    border-radius: 3px; 
+    margin-left: 8px;
+    white-space: nowrap;
+}
+li.is-variable .lwwc-variable-label .dashicons { 
+    line-height: 1; 
+    margin-right: 2px; 
+    vertical-align: middle;
+    display: inline-block;
+    margin-top: 0;
+}
+
+/* Remove the old ::after styling for variable products */
+li.is-variable::after { display: none; }
+
+/* Quick Select Card */
+/* Use WP admin background and border */
+.lwwc-quick-select-card {
+    background: var(--wp-admin-background-color, #fff);
+    border: 1px solid var(--wp-admin-border-color, #dcdcde);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    grid-area: quickselect; /* merged from duplicate block */
+}
+
+.lwwc-quick-select-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Use WP admin text color */
+.lwwc-quick-select-header h3 {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--wp-admin-text-color, #1d2327);
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.lwwc-filter-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.lwwc-filter-group select {
+    min-width: 180px;
+}
+
+.lwwc-quick-select-results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 40px;
+}
+
+.lwwc-quick-select-results .button {
+    margin: 0;
+    font-size: 13px;
+    height: auto;
+    line-height: 1.4;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.lwwc-quick-select-results .button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Legacy Quick Select Area (keeping for backward compatibility) */
+.lwwc-quick-select-area {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--wp-admin-subtle-background, #f6f7f7);
+    border: 1px solid var(--wp-admin-border-color, #ddd);
+    border-radius: 4px;
+}
+
+.lwwc-quick-select-area .lwwc-quick-select-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.lwwc-quick-select-area .lwwc-quick-select-header h4 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.lwwc-quick-select-area label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+.lwwc-quick-select-container {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 30px; /* Prevents layout shift while spinner is active */
+}
+.lwwc-quick-select-container .spinner {
+    margin: 0;
+    float: none;
+}
+.lwwc-quick-select-container .no-results {
+    color: #777;
+    font-style: italic;
+    margin: 0;
+}
+.lwwc-quick-select-container button {
+    margin: 0; /* Override default button margins */
+}
+
+/* Selected Items Lists */
+#lwwc-product-selection-area, #lwwc-coupon-selection-area, #lwwc-cart-redirect-options { margin-bottom: 2rem; }
+.products-list .placeholder, .coupons-list .placeholder, #lwwc-coupon-selection-area .placeholder, #lwwc-selected-coupons-list-checkout .placeholder, #lwwc-saved-links-list .placeholder, #lwwc-selected-page .placeholder {
+    color: var(--wp-admin-subtle-text, #777);
+    font-style: italic;
+    padding: 1rem;
+    border: 2px dashed var(--wp-admin-border-color, #e0e0e0);
+    text-align: center;
+    margin: 0;
+}
+
+/* Hide duplicate placeholders when multiple appear */
+.products-list .placeholder:nth-of-type(n+2),
+.coupons-list .placeholder:nth-of-type(n+2),
+#lwwc-coupon-selection-area .placeholder:nth-of-type(n+2),
+#lwwc-selected-coupons-list-checkout .placeholder:nth-of-type(n+2) {
+    display: none;
+}
+
+.lwwc-selected-item, .lwwc-selected-coupon, .lwwc-selected-page-item {
+     display: flex; align-items: center; padding: 10px; border: 1px solid var(--wp-admin-border-color, #ddd); border-radius: 4px; margin-bottom: 10px; background: var(--wp-admin-subtle-background, #f9f9f9);
+}
+.lwwc-selected-item .item-name, .lwwc-selected-coupon .item-name, .lwwc-selected-coupon .coupon-name, .lwwc-selected-page-item .item-name { 
+    flex-grow: 1; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.lwwc-selected-item .item-quantity { margin: 0 10px; }
+.lwwc-selected-item .item-quantity input { width: 60px; text-align: center; }
+
+/* Remove button positioning - align to the right */
+.lwwc-selected-coupon .coupon-remove,
+.lwwc-selected-coupon .item-remove,
+.lwwc-selected-item .item-remove,
+.lwwc-selected-page-item .item-remove {
+    margin-left: auto;
+}
+
+/* Extra specificity for coupon remove buttons to ensure they align right */
+.lwwc-selected-coupon .coupon-remove {
+    margin-left: auto !important;
+    display: flex;
+    align-items: center;
+}
+
+.lwwc-selected-coupon .item-remove {
+    margin-left: auto !important;
+    display: flex;
+    align-items: center;
+}
+
+/* Style the actual remove coupon button within its container */
+.lwwc-selected-coupon .coupon-remove .lwwc-button.is-destructive {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+}
+
+.lwwc-selected-coupon .coupon-remove .lwwc-button.is-destructive .dashicons {
+    width: 16px;
+}
+
+/* Coupon styling for better visual hierarchy */
+.lwwc-selected-coupon .coupon-code {
+    font-weight: 600;
+    color: var(--lwwc-theme-primary, #a3b745);
+}
+
+.lwwc-selected-coupon .coupon-description {
+    font-size: 0.9em;
+    color: var(--wp-admin-subtle-text, #777);
+    margin-left: 8px;
+}
+
+.lwwc-selected-coupon .dashicons-tickets-alt {
+    color: var(--lwwc-theme-primary, #a3b745);
+}
+
+/* Add spacing above selected page item */
+.lwwc-selected-page-item {
+    margin-top: 16px;
+}
+
+/* Add spacing above page placeholder - but reduce since grid gap provides some spacing */
+#lwwc-selected-page .placeholder {
+    margin-top: 8px !important;
+}
+
+
+/* Saved Links List Styling */
+.saved-link-item {
+    background: var(--wp-admin-background-color, #fff);
+    border: 1px solid var(--wp-admin-border-color, #dcdcde);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.saved-link-item:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    border-color: var(--lwwc-theme-primary, #a3b745);
+}
+
+.saved-link-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Saved Link Actions Footer */
+.saved-link-actions-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--wp-admin-border-color, #e0e0e0);
+    position: relative; /* merged from duplicate block */
+}
+
+.saved-link-actions-footer .button {
+    margin: 0;
+    padding: 8px 12px;
+    font-size: 13px;
+    height: auto;
+    line-height: 1.4;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.saved-link-actions-footer .button .dashicons {
+    vertical-align: middle;
+    margin-right: 5px;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+}
+
+/* Button style variations for saved links */
+.saved-link-actions-footer.lwwc-button-style-icons .button-text {
+    display: none !important;
+}
+
+.saved-link-actions-footer.lwwc-button-style-icons .button .dashicons {
+    margin-right: 0 !important;
+}
+
+.saved-link-actions-footer.lwwc-button-style-text .button .dashicons {
+    display: none !important;
+}
+
+/* Saved Link Content Styling */
+.saved-link-item .saved-link-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.saved-link-item .saved-link-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--wp-admin-text-color, #1d2327);
+    margin: 0 0 8px 0;
+    flex: 1;
+}
+
+.saved-link-item .saved-link-meta {
+    font-size: 13px;
+    color: var(--wp-admin-subtle-text, #666);
+    margin-bottom: 12px;
+}
+
+/* Inline content layout for cart links */
+.saved-link-item .saved-link-content-inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+/* Inline content layout for checkout links (similar to cart links) */
+.saved-link-item .saved-link-content-inline.saved-link-checkout-inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+/* Saved Link Redirect styling - consistent with coupon styling */
+.saved-link-item .saved-link-redirect {
+    font-size: 13px;
+    color: var(--wp-admin-subtle-text, #666);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    margin-bottom: 0;
+}
+
+.saved-link-item .saved-link-redirect .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--lwwc-theme-link, #0073aa);
+}
+
+.saved-link-item .saved-link-redirect .redirect-text {
+    font-weight: 500;
+    color: var(--wp-admin-subtle-text, #666);
+}
+
+/* Coupon styling for saved links - consistent with redirect styling */
+.saved-link-item .saved-link-coupons {
+    font-size: 13px;
+    color: var(--wp-admin-subtle-text, #666);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+}
+
+.saved-link-item .saved-link-coupon {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 8px;
+}
+
+.saved-link-item .saved-link-coupon .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--lwwc-theme-primary, #a3b745);
+}
+
+.saved-link-item .saved-link-coupon .coupon-code {
+    font-weight: 500;
+    color: var(--lwwc-theme-primary, #a3b745);
+}
+
+/* Empty coupon state - disabled appearance */
+.saved-link-item .saved-link-coupon.saved-link-coupon-empty {
+    opacity: 0.6;
+}
+
+.saved-link-item .saved-link-coupon.saved-link-coupon-empty .dashicons {
+    color: var(--wp-admin-subtle-text, #999);
+}
+
+.saved-link-item .saved-link-coupon.saved-link-coupon-empty .coupon-code {
+    color: var(--wp-admin-subtle-text, #999);
+    font-style: italic;
+    font-weight: normal;
+}
+
+/* Move remove button to top right using absolute positioning */
+.saved-link-actions-footer .remove-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 16px 0 0 0;
+    font-size: 12px;
+}
+
+/* Ensure the actions footer doesn't interfere with the positioned remove button */
+.saved-link-actions-footer {
+    position: relative;
+}
+
+/* Saved Link URL Display */
+.saved-link-item .saved-link-url {
+    background: #f6f7f7;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-family: monospace;
+    font-size: 14px;
+    color: var(--wp-admin-text-color, #333);
+    word-break: break-all;
+    margin-top: 20px;
+    margin-bottom: 16px;
+    min-height: 20px;
+    width: calc(100% - 24px);
+    display: none; /* Hidden by default, shown when .show is added */
+}
+.saved-link-item .saved-link-url.show {
+    display: block;
+}
+.saved-link-item .saved-link-url input[type="text"] {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-family: monospace;
+    font-size: 14px;
+    color: var(--wp-admin-text-color, #333);
+    padding: 0;
+    outline: none;
+    margin: 0;
+}
+
+/* Redirect Options - Grid Layout */
+#lwwc-cart-redirect-options {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-areas: 
+        "radio-options page-search"
+        "radio-options selected-page";
+    grid-template-rows: auto auto;
+    gap: 16px 30px;
+    align-items: start;
+    margin-bottom: 2rem;
+    /* Defensive styling to prevent external interference */
+    isolation: isolate;
+    contain: layout style;
+}
+
+/* Any unexpected elements should not interfere with the grid */
+#lwwc-cart-redirect-options > *:not(fieldset):not(#lwwc-page-search-wrapper):not(#lwwc-selected-page):not(p) {
+    /* Force any unexpected elements to not participate in grid layout */
+    grid-column: 1 / -1; /* Span full width if they must appear */
+    margin-top: 20px;
+    order: 999; /* Push to bottom */
+    display: block !important;
+    /* Contain these elements */
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+/* Radio buttons container - Left Column, spans both rows */
+#lwwc-cart-redirect-options fieldset { 
+    grid-area: radio-options;
+    border: none; 
+    padding: 0; 
+    margin: 0; 
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#lwwc-cart-redirect-options fieldset p {
+    margin: 0 0 16px 0;
+    font-weight: 600;
+}
+
+#lwwc-cart-redirect-options fieldset legend {
+    position: absolute;
+    clip: rect(1px, 1px, 1px, 1px);
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    width: 1px;
+    word-wrap: normal;
+}
+
+#lwwc-cart-redirect-options label { 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    line-height: 1.5;
+    padding: 8px 12px;
+    border: 1px solid var(--wp-admin-border-color, #ddd);
+    border-radius: 4px;
+    background: var(--wp-admin-background-color, #fff);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Left side: radio button + text */
+#lwwc-cart-redirect-options label .lwwc-redirect-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+#lwwc-cart-redirect-options input[type="radio"] { 
+    margin-right: 10px;
+    margin-left: 0;
+    flex-shrink: 0;
+}
+
+/* Right side: icon */
+#lwwc-cart-redirect-options label .lwwc-redirect-icon {
+    margin-left: auto;
+    color: var(--wp-admin-subtle-text, #999);
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+}
+
+#lwwc-cart-redirect-options label:hover .lwwc-redirect-icon {
+    color: var(--wp-admin-theme-color-focus);
+}
+
+#lwwc-cart-redirect-options label:hover {
+    background: var(--wp-admin-subtle-background, #f8f9fa);
+    border-color: var(--lwwc-theme-primary, #a3b745);
+}
+
+#lwwc-cart-redirect-options input[type="radio"] { 
+    margin-right: 10px;
+    margin-left: 0;
+    flex-shrink: 0;
+}
+
+#lwwc-cart-redirect-options input[type="radio"]:checked + span {
+    font-weight: 600;
+    color: var(--wp-admin-theme-color-highlight);
+}
+
+/* When radio is checked, highlight the icon */
+#lwwc-cart-redirect-options label:has(input[type="radio"]:checked) .lwwc-redirect-icon,
+#lwwc-cart-redirect-options label.checked .lwwc-redirect-icon {
+    color: var(--wp-admin-theme-color-focus);
+}
+
+/* Page Search - Right Column, Top Row */
+#lwwc-page-search-wrapper { 
+    grid-area: page-search;
+    margin-top: 3em; 
+    overflow: visible;
+    transition: opacity 0.3s ease;
+}
+
+/* Selected Page - Right Column, Bottom Row */
+#lwwc-selected-page {
+    grid-area: selected-page;
+    margin-top: 0; /* Remove margin since grid gap handles spacing */
+}
+
+/* Greyed out state when custom page is not selected */
+#lwwc-page-search-wrapper.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#lwwc-page-search-wrapper.disabled input,
+#lwwc-page-search-wrapper.disabled label,
+#lwwc-page-search-wrapper.disabled h3 {
+    color: var(--wp-admin-subtle-text, #999) !important;
+    cursor: not-allowed !important;
+}
+
+#lwwc-page-search-wrapper.disabled input {
+    background-color: #f5f5f5 !important;
+    border-color: #ddd !important;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 1200px) {
+    #lwwc-cart-redirect-options {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "radio-options"
+            "page-search"
+            "selected-page";
+        gap: 20px;
+    }
+}
+
+/* Link Display & Segmented URL Styling */
+
+.lwwc-link-display {
+    margin-bottom: 16px;
+    display: block;
+    width: 100%;
+}
+
+.lwwc-segmented-url {
+    display: inline-flex;
+    align-items: center;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    background: #f6f7f7;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    word-break: break-all;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 16px;
+    min-height: 20px;
+    width: 100%;
+}
+
+/* Base URL styling */
+.lwwc-segmented-url .url-base,
+.lwwc-segmented-url .url-base-cart,
+.lwwc-segmented-url .url-base-checkout {
+    color: #666;
+    font-weight: normal;
+    background: transparent;
+}
+
+/* Dynamic URL insertion point - highlighted in WordPress link color */
+.lwwc-segmented-url .lwwc-url-insert,
+.lwwc-segmented-url .lwwc-url-insert-cart,
+.lwwc-segmented-url .lwwc-url-insert-checkout {
+    color: var(--lwwc-theme-link, #0073aa);
+    font-weight: 900 !important;
+    background: var(--lwwc-theme-link-bg, rgba(0, 115, 170, 0.1));
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.lwwc-segmented-url .lwwc-url-insert:not(:empty),
+.lwwc-segmented-url .lwwc-url-insert-cart:not(:empty),
+.lwwc-segmented-url .lwwc-url-insert-checkout:not(:empty) {
+    background: var(--lwwc-theme-link-bg, rgba(0, 115, 170, 0.15));
+}
+
+/* URL parameters - using WordPress admin theme color */
+.lwwc-segmented-url .url-params {
+    font-weight: 600;
+    padding: 1px 3px;
+    border-radius: 2px;
+}
+
+/* Parameter keys (product= and coupon=) - WordPress primary theme color */
+.lwwc-segmented-url .url-params [class*="param-key"] {
+    color: var(--lwwc-theme-primary, #a3b745);
+    font-weight: 700;
+    background: var(--lwwc-theme-primary-bg, rgba(163, 183, 69, 0.1));
+    padding: 1px 3px;
+    border-radius: 2px;
+}
+
+/* Product IDs and coupon values - WordPress notification/accent color */
+.lwwc-segmented-url .url-params .param-product-id,
+.lwwc-segmented-url .url-params .param-value.param-coupon,
+/* Add-to-Cart ID and Quantity */
+.lwwc-segmented-url .url-params  .param-value.param-value-add-to-cart,
+.lwwc-segmented-url .url-params  .param-value.param-value-quantity,
+/* General parameter values - catch-all for any parameter values that don't have specific classes */
+.lwwc-segmented-url .url-params .param-value:not([class*="param-value-"]):not(.param-coupon):not(.param-product-id)  {
+    color: var(--lwwc-theme-notification, var(--lwwc-theme-link)) ;
+    font-weight: 600;
+    background: var(--lwwc-theme-notification-bg, var(--lwwc-theme-link-bg));
+    padding: 1px 3px;
+    border-radius: 2px;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+    .lwwc-segmented-url {
+        font-size: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        word-break: break-all;
+    }
+}
+
+/* Modals */
+.lwwc-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+}
+
+/* Modal visibility classes */
+.lwwc-modal-visible {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.lwwc-modal-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+.lwwc-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--wp-admin-background-color, #fff);
+    padding: 0;
+    border-radius: 8px;
+    min-width: 300px;
+    max-width: 500px;
+    max-height: 70vh;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Standard Modal Header (for confirm dialogs etc.) */
+.lwwc-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #ddd;
+    background: #f9f9f9;
+    border-radius: 8px 8px 0 0;
+}
+
+.lwwc-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.lwwc-modal-close {
+    background: var(--wp-admin-error-color, #d63638);
+    border: 1px solid var(--wp-admin-error-color, #d63638);
+    color: var(--wp-admin-background-color, #fff);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* Standard Modal Body Content */
+.lwwc-modal-content > p,
+.lwwc-modal-content > div:not(.lwwc-modal-header):not(.lwwc-modal-footer) {
+    padding: 20px 24px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Standard Modal Footer */
+.lwwc-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #ddd;
+    background: #f9f9f9;
+    border-radius: 0 0 8px 8px;
+}
+
+.lwwc-modal-footer .button {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    border-radius: 4px;
+}
+
+/* Large Modal Styling - specifically for variation modal with 2-column layout */
+.lwwc-modal-large .lwwc-modal-content {
+    width: 85vw;
+    max-width: 1400px;
+    min-width: 400px;
+    height: 80vh;
+    max-height: 800px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Variation Modal - New Blank Modal Styles */
+.lwwc-variation-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 999999 !important;
+    display: none !important;
+}
+
+.lwwc-variation-modal.lwwc-modal-visible {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.lwwc-variation-modal.lwwc-modal-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+.lwwc-variation-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.lwwc-variation-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 0;
+    border-radius: 8px;
+    min-width: 900px;
+    max-width: 1200px;
+    width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.lwwc-variation-modal .lwwc-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #ddd;
+    background: #f9f9f9;
+    border-radius: 8px 8px 0 0;
+}
+
+.lwwc-variation-modal .lwwc-modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.lwwc-variation-modal .lwwc-modal-close {
+    background: #d63638;
+    border: 1px solid #d63638;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.lwwc-variation-modal .lwwc-modal-close:hover {
+    background: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.lwwc-variation-modal .lwwc-modal-body {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    flex: 1;
+    min-height: 0;
+    height: calc(90vh - 80px);
+    max-height: calc(90vh - 80px);
+    overflow: hidden;
+    transition: height 0.3s ease-out, max-height 0.3s ease-out;
+}
+
+.lwwc-variation-modal .lwwc-blank-content h4 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Frontend-like Variation Form Styles */
+.lwwc-variation-modal .lwwc-product-info {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.lwwc-variation-modal .lwwc-product-title {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.lwwc-variation-modal .lwwc-product-price {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--wp-admin-subtle-text, #666);
+}
+
+.lwwc-variation-modal .lwwc-product-price .price-text {
+    color: #0073aa;
+}
+
+.lwwc-variation-form {
+    margin: 16px 0;
+}
+
+.lwwc-variation-attributes {
+    margin-bottom: 20px;
+}
+
+.lwwc-variation-attribute {
+    margin-bottom: 16px;
+}
+
+.lwwc-variation-attribute label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.lwwc-variation-attribute-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    font-size: 14px;
+    min-height: 36px;
+    transition: border-color 0.2s ease;
+}
+
+.lwwc-variation-attribute-select:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.1);
+}
+
+.lwwc-variation-summary {
+    margin: 20px 0;
+    padding: 16px;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+}
+
+.lwwc-variation-summary h5 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.lwwc-variation-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lwwc-variation-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.lwwc-variation-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0073aa;
+}
+
+.lwwc-variation-sku {
+    font-size: 12px;
+    color: #666;
+}
+
+.lwwc-variation-attributes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.lwwc-attr-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #0073aa;
+}
+
+.lwwc-clear-selection {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.lwwc-reset-variations {
+    font-size: 12px;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.lwwc-reset-variations:hover {
+    color: #0073aa;
+    text-decoration: underline;
+}
+
+.lwwc-variation-modal .lwwc-add-variation-to-link {
+    background: #0073aa;
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+.lwwc-variation-modal .lwwc-add-variation-to-link:hover:not(:disabled) {
+    background: #005a87;
+}
+
+.lwwc-variation-modal .lwwc-add-variation-to-link:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Variation Modal Filters - Left Sidebar */
+.lwwc-variation-filters {
+    background: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.lwwc-variation-filters h4 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.lwwc-variation-filters .filter-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100% !important;
+}
+
+.lwwc-variation-filters .filter-group {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box !important;
+    position: static !important;
+    float: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.lwwc-variation-filters .filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.lwwc-variation-filters .lwwc-variation-filter {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    width: 100%;
+    min-height: 40px;
+    line-height: 1.4;
+}
+
+.lwwc-variation-filters .lwwc-search-variations {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    width: 100%;
+    min-height: 40px;
+    line-height: 1.4;
+}
+
+.lwwc-variation-filters .lwwc-variation-filter:focus,
+.lwwc-variation-filters .lwwc-search-variations:focus {
+    border-color: #0073aa;
+    outline: none;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+.lwwc-variation-filters .lwwc-clear-filters {
+    padding: 10px 16px;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 8px;
+    min-height: 40px;
+    line-height: 1.4;
+}
+
+/* Variations Count Display */
+.lwwc-variations-count {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: var(--wp-admin-background-color, #fff);
+    border-bottom: 1px solid var(--wp-admin-border-color, #e0e0e0);
+    font-size: 13px;
+    color: var(--wp-admin-subtle-text, #666);
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lwwc-variations-count .filtered-count {
+    color: #0073aa;
+    font-weight: 600;
+}
+
+.lwwc-variations-count .total-count {
+    color: var(--wp-admin-text-color, #333);
+    font-weight: 600;
+}
+
+.lwwc-variations-count .lwwc-reset-filters-header {
+    background: #0073aa !important;
+    border: 1px solid #0073aa !important;
+    color: white !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    padding: 4px 8px !important;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    height: auto !important;
+    line-height: 1.2 !important;
+}
+
+.lwwc-variations-count .lwwc-reset-filters-header:hover {
+    background: #005a87 !important;
+    border-color: #005a87 !important;
+}
+
+.lwwc-variations-count .lwwc-reset-filters-header:focus {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px #0073aa !important;
+}
+
+.lwwc-variations-count .lwwc-reset-filters-header.lwwc-reset-disabled {
+    background: #ddd !important;
+    border-color: #ddd !important;
+    color: #999 !important;
+    cursor: not-allowed !important;
+}
+
+.lwwc-variations-count .lwwc-reset-filters-header.lwwc-reset-disabled:hover {
+    background: #ddd !important;
+    border-color: #ddd !important;
+}
+
+.lwwc-variations-count .lwwc-reset-filters-header.lwwc-reset-enabled {
+    background: #0073aa !important;
+    border: 1px solid #0073aa !important;
+    color: white !important;
+    cursor: pointer !important;
+}
+
+.lwwc-variations-count .lwwc-reset-filters-header.lwwc-reset-enabled:hover {
+    background: #005a87 !important;
+    border-color: #005a87 !important;
+}
+
+/* Right Column - Variations Section */
+.lwwc-variations-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    background: white;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.lwwc-variations-section-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    min-height: 0;
+    max-height: calc(90vh - 140px);
+    transition: max-height 0.3s ease-out;
+}
+
+/* Variations List */
+.lwwc-variations-list {
+    height: 100%;
+    overflow: visible;
+    background: white;
+    transition: height 0.3s ease-out;
+}
+
+.lwwc-variation-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease, opacity 0.3s ease-out, max-height 0.3s ease-out, padding 0.3s ease-out, margin 0.3s ease-out;
+    gap: 16px;
+    opacity: 1;
+    max-height: 200px; /* Sufficient for any variation item */
+    overflow: hidden;
+}
+
+.lwwc-variation-item:last-child {
+    border-bottom: none;
+}
+
+.lwwc-variation-item:hover {
+    background-color: #f8f9fa;
+}
+
+.lwwc-variation-item.incomplete {
+    background-color: #fff8e1;
+    border-left: 4px solid #ff9800;
+}
+
+.lwwc-variation-item.complete {
+    border-left: 4px solid #4caf50;
+}
+
+/* Hidden state for filtered items */
+.lwwc-variation-item.lwwc-filtered-hidden {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-bottom-width: 0;
+}
+
+.lwwc-variation-item .variation-info {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.lwwc-variation-item .variation-status {
+    font-size: 16px;
+}
+
+.lwwc-variation-item .variation-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    min-width: 0;
+}
+
+.lwwc-variation-item .variation-attributes {
+    font-size: 13px;
+    color: var(--wp-admin-subtle-text, #666);
+    font-style: italic;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lwwc-variation-item .variation-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0073aa;
+    white-space: nowrap;
+}
+
+.lwwc-variation-item .lwwc-select-variation {
+    padding: 8px 16px;
+    font-size: 13px;
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+.lwwc-variation-item .lwwc-select-variation:disabled {
+    background-color: #f0f0f0;
+    color: #999;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+
+/* Visual separation and polish */
+.lwwc-filters-column {
+    min-height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.lwwc-variations-section-header {
+    background: #fafafa;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.lwwc-variation-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.lwwc-variation-warning h4 {
+    margin: 0 0 8px 0;
+    color: #856404;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.lwwc-variation-warning p {
+    margin: 0 0 8px 0;
+    color: #856404;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.lwwc-variation-warning .button-primary {
+    background: #0073aa;
+    border-color: #0073aa;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+/* Scrollbar styling for webkit browsers */
+.lwwc-variation-filters::-webkit-scrollbar,
+.lwwc-variations-section-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lwwc-variation-filters::-webkit-scrollbar-track,
+.lwwc-variations-section-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.lwwc-variation-filters::-webkit-scrollbar-thumb,
+.lwwc-variations-section-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.lwwc-variation-filters::-webkit-scrollbar-thumb:hover,
+.lwwc-variations-section-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Modal Responsive adjustments */
+@media (max-width: 1000px) {
+    .lwwc-variation-modal-content {
+        min-width: 90vw;
+        width: 95vw;
+        margin: 20px;
+    }
+    
+    .lwwc-variation-modal .lwwc-modal-body {
+        grid-template-columns: 1fr;
+        height: calc(70vh - 120px);
+        max-height: calc(70vh - 120px);
+    }
+    
+    .lwwc-variation-filters {
+        border-right: none;
+        overflow-y: auto;
+        max-height: 200px;
+        height: auto;
+    }
+    
+    .lwwc-variation-filters .filter-controls {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+    
+    .lwwc-variation-filters .filter-group {
+        float: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .lwwc-variations-section-body {
+        overflow-y: auto;
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 600px) {
+    .lwwc-variation-modal-content {
+        min-width: 95vw;
+        margin: 10px;
+    }
+    
+    .lwwc-variation-filters .filter-controls {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+    
+    .lwwc-variation-filters .filter-group {
+        float: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    .lwwc-variation-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .lwwc-variation-item .variation-info {
+        grid-template-columns: auto 1fr;
+        gap: 8px;
+    }
+    
+    .lwwc-variation-item .lwwc-select-variation {
+        width: 100%;
+        justify-self: stretch;
+    }
+}
+
+/* Step Content Grid Layout - Search + Quick Select */
+.lwwc-step-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-areas: 
+        "search quickselect"
+        "selected selected";
+    gap: 30px;
+    align-items: start;
+}
+
+/* Search Section - Left Column */
+.lwwc-search-section {
+    grid-area: search;
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Quick Select Card - Right Column */
+.lwwc-quick-select-card {
+    grid-area: quickselect;
+}
+
+/* Selected Products - Full Width Below */
+.lwwc-selected-section {
+    grid-area: selected;
+}
+
+/* Coupon Step Content Grid Layout - Search + Quick Select (1fr : 2fr ratio) */
+.lwwc-coupons-checkout-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-areas: 
+        "coupon-search coupon-quickselect"
+        "coupon-selected coupon-selected";
+    gap: 30px;
+    align-items: start;
+}
+
+/* Coupon Search Section - Left Column (1fr) */
+.lwwc-coupon-search-wrapper {
+    grid-area: coupon-search;
+    position: relative; /* merged from duplicate block */
+    overflow: visible !important;
+}
+
+/* Coupon Quick Select Card - Right Column (2fr) */
+.lwwc-coupon-quick-select-card {
+    grid-area: coupon-quickselect;
+    background: var(--wp-admin-background-color, #fff);
+    border: 1px solid var(--wp-admin-border-color, #dcdcde);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Coupon Quick Select Header - Flex Layout */
+.lwwc-coupon-quick-select-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.lwwc-coupon-quick-select-header h3 {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--wp-admin-text-color, #1d2327);
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Selected Coupons - Full Width Below */
+.lwwc-selected-coupons-checkout {
+    grid-area: coupon-selected;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 1200px) {
+    .lwwc-step-content {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "search"
+            "quickselect"
+            "selected";
+        gap: 20px;
+    }
+    
+    .lwwc-coupons-checkout-content {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "coupon-search"
+            "coupon-quickselect"
+            "coupon-selected";
+        gap: 20px;
+    }
+}
+
+/* Coupon search specific styling */
+#lwwc-coupon-search-results-checkout {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--wp-admin-background-color, #fff);
+    border: 1px solid var(--wp-admin-border-color, #dcdcde);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+/* Ensure coupon search wrapper has relative positioning for dropdown */
+.lwwc-coupon-search-wrapper {
+    position: relative; /* merged from duplicate block */
+}
+
+/* Coupon Search Section Styling */
+.lwwc-coupon-search-checkout h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--wp-admin-text-color, #1d2327);
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Ensure product and coupon search inputs are full width */
+#lwwc-product-search,
+#lwwc-product-search-checkout,
+#lwwc-coupon-search-checkout {
+    width: 100% !important;
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Link Generation & Output */
+.lwwc-generator-output { 
+    margin-top: 1.5rem; 
+    padding: 20px; 
+    display: block;
+    visibility: visible;
+    position: relative;
+    background: var(--wp-admin-background-color, #fff);
+    border: 1px solid var(--wp-admin-border-color, #c3c4c7);
+    border-radius: 6px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.lwwc-generator-output .description { margin-bottom: 1em; }
+/* Quick Select Disabled Message (migrated from quick-select-disabled.css) */
+.lwwc-quick-select-disabled-message {
+    background: var(--wp-admin-subtle-background, #f8fafc);
+    border: 1px dashed var(--wp-admin-border-color, #c3c4c7);
+    border-radius: 6px;
+    color: var(--wp-admin-subtle-text, #888);
+    font-size: 1.08em;
+    padding: 18px 0;
+    margin: 10px 0 0 0;
+    text-align: center;
+}
+.lwwc-quick-select-disabled-message a {
+    color: var(--lwwc-theme-link, #0073aa);
+    text-decoration: underline;
+}
+.lwwc-quick-select-disabled-message strong {
+    color: var(--wp-admin-error-color, #b32d2e);
+}
+
+/* Action Buttons Layout */
+.lwwc-action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Ensure reset button (destructive buttons) align to the right when multiple buttons present */
+.lwwc-action-buttons .is-destructive {
+    margin-left: auto;
+}
+
+/* When there are multiple destructive buttons, ensure proper spacing */
+.lwwc-action-buttons .is-destructive + .is-destructive {
+    margin-left: 10px;
+}
+
+/* Override when reset button is the only destructive button */
+.lwwc-action-buttons .is-destructive:only-of-type {
+    margin-left: auto;
+}
+
+.lwwc-generator-output .lwwc-segmented-url {
+    overflow-x: auto;
+    word-wrap: normal;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.lwwc-generator-output .button:not(.lwwc-button) {
+  /* If you have any context-specific button styles for .lwwc-generator-output, put them here. */
+}
+
+/* Wizard-specific styles (if needed) */
+.lwwc-generator-output.cart {}
+.lwwc-generator-output.checkout {}
+
+
+/* Duplicate Saved Link Highlighting */
+.saved-link-item.lwwc-duplicate-highlight {
+    background-color: var(--lwwc-theme-notification-bg, rgba(212, 78, 33, 0.1)) !important;
+    border-color: var(--lwwc-theme-notification, #d54e21) !important;
+    box-shadow: 0 0 0 1px var(--lwwc-theme-notification, #d54e21) !important;
+    animation: lwwc-duplicate-pulse 2s ease-in-out;
+}
+
+@keyframes lwwc-duplicate-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 1px var(--lwwc-theme-notification, #d54e21);
+    }
+    50% {
+        box-shadow: 0 0 0 3px var(--lwwc-theme-notification, #d54e21);
+    }
+}
+
+#lwwc-global-alert-area {
+    position: sticky;
+    top: 40px;
+    z-index: 9999;
+    width: 99%;
+    background: var(--wp-admin-background-color, #fff);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* =============================================================================
+   Woo Link Wizard Banner Notice (WordPress core theme-adaptive only)
+   ============================================================================= */
+.lwwc-banner-notice {
+  display: flex;
+  font-family: var(--wp-admin-font-family, system-ui, sans-serif);
+  font-size: var(--wp-admin-font-size, 15px);
+  background-color: var(--wp-admin-background-color);
+  border-left: 4px solid var(--wp-admin-theme-color);
+  fill: var(--wp-admin-theme-color);
+  color: var(--wp-admin-text-color);
+  margin-top: 24px;
+  padding: 12px;
+  box-shadow: 0 2px 6px 0 rgba(0,0,0,0.05);
+  align-items: flex-start;
+}
+.lwwc-banner-notice.is-success {
+  border-left-color: var(--wp-admin-success-color);
+  fill: var(--wp-admin-success-color);
+  color: var(--wp-admin-success-color);
+}
+.lwwc-banner-notice.is-warning {
+  border-left-color: var(--wp-admin-warning-color);
+  fill: var(--wp-admin-warning-color);
+  color: var(--wp-admin-warning-color);
+}
+.lwwc-banner-notice.is-error {
+  border-left-color: var(--wp-admin-error-color);
+  fill: var(--wp-admin-error-color);
+  color: var(--wp-admin-error-color);
+}
+.lwwc-banner-notice__icon {
+  flex-shrink: 0;
+  margin-right: 12px;
+  margin-left: -2px;
+  height: 21px;
+  width: 21px;
+  display: flex;
+  align-items: center;
+}
+.lwwc-banner-notice__content {
+  flex-grow: 1;
+  align-self: center;
+}
+.lwwc-banner-notice__actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  column-gap: 12px;
+  margin-top: 12px;
+}
+.lwwc-banner-notice__dismiss.components-button.has-icon {
+  flex-shrink: 0;
+  padding: 0;
+  min-width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  align-self: flex-start;
+  color: var(--wp-admin-text-color);
+}
+.lwwc-banner-notice__dismiss.components-button.has-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.lwwc-banner-notice + .lwwc-banner-notice,
+.lwwc-banner-notice:first-child {
+  margin-top: 0;
+}
+
+/* Unified Woo Link Wizard Button Styles */
+.wp-core-ui button.lwwc-button,
+.wp-core-ui a.lwwc-button,
+.wp-core-ui input[type="button"].lwwc-button,
+.wp-core-ui input[type="submit"].lwwc-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 1em;
+  font-size: 14px;
+  line-height: 1.4;
+  border-radius: 4px;
+  border: 1px solid var(--wp-admin-border-color, #c3c4c7);
+  background: var(--wp-admin-background-color, #fff);
+  color: var(--wp-admin-theme-color, #0073aa);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  min-width: 36px;
+  box-sizing: border-box;
+  height: auto;
+}
+
+.wp-core-ui button.lwwc-button:disabled,
+.wp-core-ui a.lwwc-button[aria-disabled="true"],
+.wp-core-ui input[type="button"].lwwc-button:disabled,
+.wp-core-ui input[type="submit"].lwwc-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.wp-core-ui button.lwwc-button .dashicons,
+.wp-core-ui a.lwwc-button .dashicons {
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 6px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.wp-core-ui button.lwwc-button .button-text,
+.wp-core-ui a.lwwc-button .button-text {
+  display: inline;
+}
+
+/* Primary variant */
+.wp-core-ui button.lwwc-button.button-primary,
+.wp-core-ui a.lwwc-button.button-primary,
+.wp-core-ui input[type="button"].lwwc-button.button-primary,
+.wp-core-ui input[type="submit"].lwwc-button.button-primary {
+  background: var(--wp-admin-theme-color, #0073aa);
+  color: var(--wp-admin-button-text-color, #fff);
+  border-color: var(--wp-admin-theme-color, #0073aa);
+}
+
+/* Destructive variant */
+.wp-core-ui button.lwwc-button.is-destructive,
+.wp-core-ui a.lwwc-button.is-destructive,
+.wp-core-ui input[type="button"].lwwc-button.is-destructive,
+.wp-core-ui input[type="submit"].lwwc-button.is-destructive {
+  background: var(--wp-admin-background-color, #fff);
+  color: var(--wp-admin-error-color, #d63638);
+  border-color: var(--wp-admin-error-color, #d63638);
+}
+.wp-core-ui button.lwwc-button.is-destructive:hover,
+.wp-core-ui a.lwwc-button.is-destructive:hover,
+.wp-core-ui input[type="button"].lwwc-button.is-destructive:hover,
+.wp-core-ui input[type="submit"].lwwc-button.is-destructive:hover {
+  background: var(--wp-admin-error-color, #d63638);
+  color: var(--wp-admin-background-color, #fff);
+}
+
+/* Hover for default (non-primary, non-destructive) */
+.wp-core-ui button.lwwc-button:hover:not(.button-primary):not(.is-destructive):not(:disabled):not([aria-disabled="true"]),
+.wp-core-ui a.lwwc-button:hover:not(.button-primary):not(.is-destructive):not(:disabled):not([aria-disabled="true"]),
+.wp-core-ui input[type="button"].lwwc-button:hover:not(.button-primary):not(.is-destructive):not(:disabled):not([aria-disabled="true"]),
+.wp-core-ui input[type="submit"].lwwc-button:hover:not(.button-primary):not(.is-destructive):not(:disabled):not([aria-disabled="true"]) {
+  background: var(--wp-admin-theme-color-darker-10, #006b96);
+  color: var(--wp-admin-button-text-color, #fff);
+  border-color: var(--wp-admin-theme-color-darker-10, #006b96);
+}
+
+.lwwc-variation-modal-content .lwwc-button-style-icons .lwwc-button .button-text { display: none !important; }
+.lwwc-variation-modal-content .lwwc-button-style-icons .lwwc-button .dashicons { margin-right: 0 !important; }
+.lwwc-variation-modal-content .lwwc-button-style-text .lwwc-button .dashicons { display: none !important; }
+.lwwc-variation-modal-content .lwwc-button-style-both .lwwc-button .button-text { display: inline !important; }
+.lwwc-variation-modal-content .lwwc-button-style-both .lwwc-button .dashicons { margin-right: 6px !important; }
+
+.lwwc-variation-item:focus-visible {
+    outline: none;
+    border-left: 4px solid var(--lwwc-theme-notification, #d54e21);
+    box-shadow: 0 0 0 2px var(--lwwc-theme-notification, #d54e21);
+    background-color: var(--lwwc-theme-notification-bg, rgba(213, 78, 33, 0.1));
+    z-index: 2;
+}
+
+.lwwc-search-results li:focus-visible,
+#lwwc-search-results li:focus-visible,
+#lwwc-search-results-checkout li:focus-visible,
+#lwwc-page-search-results li:focus-visible,
+#lwwc-coupon-search-results li:focus-visible,
+#lwwc-coupon-search-results-checkout li:focus-visible {
+    outline: none;
+    border-left: 4px solid var(--lwwc-theme-notification);
+    background: var(--lwwc-theme-notification-bg);
+    color: var(--lwwc-theme-notification);
+}
+
+/* =============================================================================
+   Saved Links Pagination Controls (WooCommerce/WP style)
+   ============================================================================= */
+.lwwc-pagination-controls {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: 16px 0 0 0;
+    font-size: 13px;
+    background: none;
+}
+.lwwc-pagination-controls button,
+.lwwc-pagination-controls .lwwc-button {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em 1em;
+    font-size: 14px;
+    line-height: 1.4;
+    border-radius: 4px;
+    border: 1px solid var(--wp-admin-border-color, #c3c4c7);
+    background: var(--wp-admin-background-color, #fff);
+    color: var(--wp-admin-theme-color, #0073aa);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    min-width: 36px;
+    box-sizing: border-box;
+    height: auto;
+}
+
+.lwwc-pagination-controls button:focus-visible,
+.lwwc-pagination-controls .lwwc-button:focus-visible {
+    border-color: var(--wp-admin-theme-color, #0073aa);
+    box-shadow: 0 0 0 2px var(--wp-admin-theme-color, #0073aa33);
+    z-index: 1;
+}
+.lwwc-pagination-controls .lwwc-pagination-current {
+    font-weight: 700;
+    color: var(--wp-admin-theme-color, #0073aa);
+    min-width: 3em;
+    text-align: center;
+    background: var(--wp-admin-background-color, #fff);
+    border: 1px solid var(--wp-admin-theme-color, #0073aa);
+    border-radius: 3px;
+    margin: 0 2px;
+    padding: 0.2em 0.5em;
+}
+
+@media (max-width: 600px) {
+    .lwwc-saved-links-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    .lwwc-pagination-controls {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+}
+
+/* Ensure Remove button is always last in the action row */
+.saved-link-actions-footer .button {
+  order: 1;
+}
+.saved-link-actions-footer .remove-btn,
+.saved-link-actions-footer .button.is-destructive {
+  order: 99;
+}
+
+@media (max-width: 600px) {
+  .saved-link-actions-footer {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    position: static !important;
+    gap: 6px !important;
+  }
+  .saved-link-actions-footer .button,
+  .saved-link-actions-footer .remove-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: static !important;
+    margin: 0 !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    max-width: 100% !important;
+    order: 1;
+  }
+  .saved-link-actions-footer .remove-btn {
+    order: 99 !important;
+  }
+  .lwwc-pagination-controls {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+  }
+}
+
+.nav-tab-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-x: visible;
+  white-space: normal;
+  gap: 4px;
+}
+.nav-tab {
+  white-space: normal;
+  word-break: break-word;
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+  text-align: center;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .nav-tab-wrapper {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .nav-tab {
+    flex: none;
+    max-width: none;
+    width: 100%;
+  }
+}
