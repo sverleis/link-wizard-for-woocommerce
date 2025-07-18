@@ -15,14 +15,9 @@ class LWWC_Admin {
         add_filter( 'plugin_row_meta', [ $this, 'add_plugin_row_meta' ], 10, 2 );
         add_filter( 'plugin_action_links_' . plugin_basename( LWWC_PLUGIN_FILE ), [ $this, 'add_plugin_action_links' ] );
 
-        // Debug hook for color scheme testing
-        add_action( 'admin_notices', [ $this, 'debug_color_detection' ] );
-
         // AJAX hooks
         add_action( 'wp_ajax_lwwc_get_filtered_products', [ $this, 'get_filtered_products_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_get_filtered_coupons', [ $this, 'get_filtered_coupons_ajax_callback' ] );
-        add_action( 'wp_ajax_lwwc_search_products', [ $this, 'search_products_ajax_callback' ] );
-        add_action( 'wp_ajax_lwwc_search_coupons', [ $this, 'search_coupons_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_search_pages', [ $this, 'search_pages_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_save_link', [ $this, 'save_link_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_delete_link', [ $this, 'delete_link_ajax_callback' ] );
@@ -148,6 +143,12 @@ private function get_admin_color_scheme_css() {
         wp_enqueue_script( $this->plugin_name . '-search-manager', LWWC_PLUGIN_URL . 'admin/js/search-manager.js', array( 'jquery' ), $this->version . '-' . time(), true );
         wp_enqueue_script( $this->plugin_name . '-link-generator', LWWC_PLUGIN_URL . 'admin/js/link-generator.js', array( 'jquery' ), $this->version . '-' . time(), true );
         wp_enqueue_script( $this->plugin_name . '-saved-links-manager', LWWC_PLUGIN_URL . 'admin/js/saved-links-manager.js', array( 'jquery' ), $this->version . '-' . time(), true );
+        
+        // New modular scripts for search and quick select
+        wp_enqueue_script( $this->plugin_name . '-product-search', LWWC_PLUGIN_URL . 'admin/js/product-search.js', array( 'jquery' ), $this->version . '-' . time(), true );
+        wp_enqueue_script( $this->plugin_name . '-coupon-search', LWWC_PLUGIN_URL . 'admin/js/coupon-search.js', array( 'jquery' ), $this->version . '-' . time(), true );
+        wp_enqueue_script( $this->plugin_name . '-product-quick-select', LWWC_PLUGIN_URL . 'admin/js/product-quick-select.js', array( 'jquery' ), $this->version . '-' . time(), true );
+        wp_enqueue_script( $this->plugin_name . '-coupon-quick-select', LWWC_PLUGIN_URL . 'admin/js/coupon-quick-select.js', array( 'jquery' ), $this->version . '-' . time(), true );
         
         // Optional modular scripts
         wp_enqueue_script( $this->plugin_name . '-variation-selection', LWWC_PLUGIN_URL . 'admin/js/variation-selection.js', array( 'jquery' ), $this->version . '-' . time(), true );
@@ -404,8 +405,6 @@ private function get_admin_color_scheme_css() {
         // AJAX hooks
         add_action( 'wp_ajax_lwwc_get_filtered_products', [ $this, 'get_filtered_products_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_get_filtered_coupons', [ $this, 'get_filtered_coupons_ajax_callback' ] );
-        add_action( 'wp_ajax_lwwc_search_products', [ $this, 'search_products_ajax_callback' ] );
-        add_action( 'wp_ajax_lwwc_search_coupons', [ $this, 'search_coupons_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_search_pages', [ $this, 'search_pages_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_save_link', [ $this, 'save_link_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_delete_link', [ $this, 'delete_link_ajax_callback' ] );
@@ -572,50 +571,6 @@ private function get_admin_color_scheme_css() {
                     'type' => $discount_type,
                     'type_label' => $type_label
                 ];
-            }
-        }
-        wp_send_json_success( $coupon_data );
-    }
-
-    /**
-     * AJAX handler for searching products.
-     */
-    public function search_products_ajax_callback() {
-        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
-        $search_term = '';
-        if ( isset( $_POST['term'] ) ) {
-            $search_term = sanitize_text_field( wp_unslash( $_POST['term'] ) );
-        }
-        if ( isset( $_POST['search_term'] ) ) {
-            $search_term = sanitize_text_field( wp_unslash( $_POST['search_term'] ) );
-        }
-        $products = wc_get_products( [ 's' => $search_term, 'limit' => 20 ] );
-        $product_data = [];
-        if ( ! empty( $products ) ) {
-            foreach ( $products as $product ) {
-                $product_data[] = LWWC_Product_Utils::get_product_data_for_js( $product );
-            }
-        }
-        wp_send_json_success( $product_data );
-    }
-
-    /**
-     * AJAX handler for searching coupons.
-     */
-    public function search_coupons_ajax_callback() {
-        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
-        $search_term = '';
-        if ( isset( $_POST['term'] ) ) {
-            $search_term = sanitize_text_field( wp_unslash( $_POST['term'] ) );
-        }
-        if ( isset( $_POST['search_term'] ) ) {
-            $search_term = sanitize_text_field( wp_unslash( $_POST['search_term'] ) );
-        }
-        $coupons = get_posts( [ 's' => $search_term, 'post_type' => 'shop_coupon', 'post_status' => 'publish', 'posts_per_page' => 20 ] );
-        $coupon_data = [];
-        if ( ! empty( $coupons ) ) {
-            foreach ( $coupons as $coupon ) {
-                $coupon_data[] = [ 'id' => $coupon->ID, 'code' => $coupon->post_title ];
             }
         }
         wp_send_json_success( $coupon_data );
