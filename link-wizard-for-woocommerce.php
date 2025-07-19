@@ -78,9 +78,13 @@ function lwwc_initialize_plugin() {
     require plugin_dir_path( __FILE__ ) . 'includes/class-lwwc-settings.php';
     require plugin_dir_path( __FILE__ ) . 'includes/utils/class-lwwc-product-utils.php';
     require plugin_dir_path( __FILE__ ) . 'includes/class-lwwc-coupon-manager.php';
+    require plugin_dir_path( __FILE__ ) . 'includes/class-lwwc-product-search.php';
+    require plugin_dir_path( __FILE__ ) . 'includes/class-lwwc-coupon-search.php';
     new LWWC_Link_Wizard();
     new LWWC_Settings();
     new LWWC_Coupon_Manager();
+    new LWWC_Product_Search();
+    new LWWC_Coupon_Search();
 }
 
 function lwwc_migrate_options() {
