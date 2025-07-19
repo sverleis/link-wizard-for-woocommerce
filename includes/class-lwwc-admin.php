@@ -16,8 +16,6 @@ class LWWC_Admin {
         add_filter( 'plugin_action_links_' . plugin_basename( LWWC_PLUGIN_FILE ), [ $this, 'add_plugin_action_links' ] );
 
         // AJAX hooks
-        add_action( 'wp_ajax_lwwc_get_filtered_products', [ $this, 'get_filtered_products_ajax_callback' ] );
-        add_action( 'wp_ajax_lwwc_get_filtered_coupons', [ $this, 'get_filtered_coupons_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_search_pages', [ $this, 'search_pages_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_save_link', [ $this, 'save_link_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_delete_link', [ $this, 'delete_link_ajax_callback' ] );
@@ -31,15 +29,198 @@ class LWWC_Admin {
         
         // AJAX for product configurator
         add_action( 'wp_ajax_lwwc_create_configured_product', [ $this, 'create_configured_product_ajax_callback' ] );
+
+        // AJAX for product search and quick select
+        add_action( 'wp_ajax_lwwc_search_products', [ $this, 'search_products_ajax_callback' ] );
+        add_action( 'wp_ajax_lwwc_get_filtered_products', [ $this, 'get_filtered_products_ajax_callback' ] );
+        // AJAX for coupon search and quick select
+        add_action( 'wp_ajax_lwwc_search_coupons', [ $this, 'search_coupons_ajax_callback' ] );
+        add_action( 'wp_ajax_lwwc_get_filtered_coupons', [ $this, 'get_filtered_coupons_ajax_callback' ] );
     }
 
-/**
- * Get WordPress admin color scheme colors and inject them as CSS custom properties.
- * This version dynamically fetches colors instead of using a hard-coded array.
- *
- * @since 1.0.0
- */
-private function get_admin_color_scheme_css() {
+    /**
+     * AJAX callback for searching products (used by quick-select.js)
+     */
+    public function search_products_ajax_callback() {
+        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
+        $search_term = isset($_POST['search_term']) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : '';
+        $results = array();
+        if ( ! empty( $search_term ) ) {
+            $args = array(
+                'post_type'      => 'product',
+                'posts_per_page' => 20,
+                's'              => $search_term,
+                'post_status'    => 'publish',
+            );
+            $query = new WP_Query( $args );
+            if ( $query->have_posts() ) {
+                foreach ( $query->posts as $post ) {
+                    $product = wc_get_product( $post->ID );
+                    if ( $product ) {
+                        $results[] = array(
+                            'id'   => $product->get_id(),
+                            'name' => $product->get_name(),
+                            'type' => $product->get_type(),
+                        );
+                    }
+                }
+            }
+        }
+        wp_send_json_success( $results );
+    }
+
+    /**
+     * AJAX callback for searching coupons (used by coupon-quick-select.js)
+     */
+    public function search_coupons_ajax_callback() {
+        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
+        $search_term = isset($_POST['search_term']) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : '';
+        $results = array();
+        if ( ! empty( $search_term ) ) {
+            $args = array(
+                'post_type'      => 'shop_coupon',
+                'posts_per_page' => 20,
+                's'              => $search_term,
+                'post_status'    => 'publish',
+            );
+            $query = new WP_Query( $args );
+            if ( $query->have_posts() ) {
+                foreach ( $query->posts as $post ) {
+                    $coupon = new WC_Coupon( $post->ID );
+                    if ( $coupon ) {
+                        $results[] = array(
+                            'id'   => $coupon->get_id(),
+                            'code' => $coupon->get_code(),
+                            'amount' => $coupon->get_amount(),
+                            'type' => $coupon->get_discount_type(),
+                        );
+                    }
+                }
+            }
+        }
+        wp_send_json_success( $results );
+    }
+
+    /**
+     * AJAX callback for getting filtered products (used by quick-select.js)
+     */
+    public function get_filtered_products_ajax_callback() {
+        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
+        $filter = isset($_POST['filter']) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : '';
+        $results = array();
+        $args = array(
+            'post_type'      => 'product',
+            'posts_per_page' => 20,
+            'post_status'    => 'publish',
+        );
+        switch ( $filter ) {
+            case 'featured':
+                $args['tax_query'][] = array(
+                    'taxonomy' => 'product_visibility',
+                    'field'    => 'name',
+                    'terms'    => 'featured',
+                );
+                break;
+            case 'on-sale':
+                $args['meta_query'][] = array(
+                    'key'     => '_sale_price',
+                    'value'   => 0,
+                    'compare' => '>',
+                    'type'    => 'NUMERIC',
+                );
+                break;
+            case 'top-rated':
+                $args['meta_key'] = 'average_rating';
+                $args['orderby'] = 'meta_value_num';
+                $args['order'] = 'DESC';
+                break;
+            case 'recent':
+                $args['orderby'] = 'date';
+                $args['order'] = 'DESC';
+                break;
+        }
+        $query = new WP_Query( $args );
+        if ( $query->have_posts() ) {
+            foreach ( $query->posts as $post ) {
+                $product = wc_get_product( $post->ID );
+                if ( $product ) {
+                    $results[] = array(
+                        'id'   => $product->get_id(),
+                        'name' => $product->get_name(),
+                        'type' => $product->get_type(),
+                    );
+                }
+            }
+        }
+        wp_send_json_success( $results );
+    }
+
+    /**
+     * AJAX callback for getting filtered coupons (used by coupon-quick-select.js)
+     */
+    public function get_filtered_coupons_ajax_callback() {
+        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
+        $filter = isset($_POST['filter']) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : '';
+        $results = array();
+        $args = array(
+            'post_type'      => 'shop_coupon',
+            'posts_per_page' => 20,
+            'post_status'    => 'publish',
+        );
+        switch ( $filter ) {
+            case 'recent':
+                $args['orderby'] = 'date';
+                $args['order'] = 'DESC';
+                break;
+            case 'amount-high':
+                $args['meta_key'] = 'coupon_amount';
+                $args['orderby'] = 'meta_value_num';
+                $args['order'] = 'DESC';
+                break;
+            case 'amount-low':
+                $args['meta_key'] = 'coupon_amount';
+                $args['orderby'] = 'meta_value_num';
+                $args['order'] = 'ASC';
+                break;
+            case 'percent':
+                $args['meta_query'][] = array(
+                    'key' => 'discount_type',
+                    'value' => 'percent',
+                    'compare' => 'LIKE',
+                );
+                break;
+            case 'fixed':
+                $args['meta_query'][] = array(
+                    'key' => 'discount_type',
+                    'value' => 'fixed',
+                    'compare' => 'LIKE',
+                );
+                break;
+        }
+        $query = new WP_Query( $args );
+        if ( $query->have_posts() ) {
+            foreach ( $query->posts as $post ) {
+                $coupon = new WC_Coupon( $post->ID );
+                if ( $coupon ) {
+                    $results[] = array(
+                        'id'   => $coupon->get_id(),
+                        'code' => $coupon->get_code(),
+                        'amount' => $coupon->get_amount(),
+                        'type' => $coupon->get_discount_type(),
+                    );
+                }
+            }
+        }
+        wp_send_json_success( $results );
+    }
+
+    /**
+     * Get WordPress admin color scheme colors and inject them as CSS custom properties.
+     * This version dynamically fetches colors instead of using a hard-coded array.
+     *
+     * @since 1.0.0
+     */
+    private function get_admin_color_scheme_css() {
     // Access the globally registered color schemes
     global $_wp_admin_css_colors;
     
@@ -81,12 +262,7 @@ private function get_admin_color_scheme_css() {
         --lwwc-theme-primary-bg: rgba({$primary_rgb}, 0.1);
         --lwwc-theme-ui: {$colors['ui']};
         --lwwc-theme-ui-bg: rgba({$ui_rgb}, 0.1);
-        --lwwc-theme-notification: {$colors['notification']};
-        --lwwc-theme-notification-bg: rgba({$notification_rgb}, 0.1);
-        --lwwc-theme-link: {$colors['link']};
-        --lwwc-theme-link-bg: rgba({$link_rgb}, 0.1);
     }";
-    
     return $css;
 }
 
@@ -403,8 +579,6 @@ private function get_admin_color_scheme_css() {
      */
     public function register_ajax_handlers() {
         // AJAX hooks
-        add_action( 'wp_ajax_lwwc_get_filtered_products', [ $this, 'get_filtered_products_ajax_callback' ] );
-        add_action( 'wp_ajax_lwwc_get_filtered_coupons', [ $this, 'get_filtered_coupons_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_search_pages', [ $this, 'search_pages_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_save_link', [ $this, 'save_link_ajax_callback' ] );
         add_action( 'wp_ajax_lwwc_delete_link', [ $this, 'delete_link_ajax_callback' ] );
@@ -446,161 +620,6 @@ private function get_admin_color_scheme_css() {
         }
         
         return $links;
-    }
-
-    /**
-     * AJAX handler to get products based on filters.
-     */
-    public function get_filtered_products_ajax_callback() {
-        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
-        $filter = isset( $_POST['filter'] ) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : 'recent';
-        $limit = LWWC_Settings::get_option( 'quick_select_limit', 10 );
-        
-        // Apply filter to allow developers to override the limit
-        $max_limit = apply_filters( 'lwwc_quick_select_max_limit', 20 );
-        
-        // Safety cap: never allow more than the filtered max to prevent performance issues
-        $limit = min( $limit, absint( $max_limit ) );
-        
-        $args = [ 
-            'post_type' => 'product', 
-            'post_status' => 'publish', 
-            'posts_per_page' => $limit 
-        ];
-        
-        switch ( $filter ) {
-            case 'featured':
-                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Necessary for admin filtering
-                $args['tax_query'] = [ [ 'taxonomy' => 'product_visibility', 'field' => 'name', 'terms' => 'featured' ] ];
-                $args['orderby'] = 'date';
-                $args['order'] = 'DESC';
-                break;
-            case 'on-sale':
-                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary for admin filtering
-                $args['meta_query'] = [ 
-                    'relation' => 'OR',
-                    [ 'key' => '_sale_price', 'value' => '', 'compare' => '!=' ],
-                    [ 'key' => '_sale_price', 'value' => 0, 'compare' => '>' ]
-                ];
-                $args['orderby'] = 'date';
-                $args['order'] = 'DESC';
-                break;
-            case 'top-rated':
-                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Necessary for admin sorting
-                $args['meta_key'] = '_wc_average_rating';
-                $args['orderby'] = 'meta_value_num';
-                $args['order'] = 'DESC';
-                break;
-            case 'recent':
-            default:
-                $args['orderby'] = 'date';
-                $args['order'] = 'DESC';
-                break;
-        }
-        
-        $products = wc_get_products( $args );
-        $product_data = [];
-        if ( ! empty( $products ) ) {
-            foreach ( $products as $product ) {
-                $product_data[] = LWWC_Product_Utils::get_product_data_for_js( $product );
-            }
-        }
-        wp_send_json_success( $product_data );
-    }
-
-    /**
-     * AJAX handler to get coupons based on filters.
-     */
-    public function get_filtered_coupons_ajax_callback() {
-        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
-        $filter = isset( $_POST['filter'] ) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : 'all';
-        $limit = LWWC_Settings::get_option( 'quick_select_limit', 10 );
-        
-        // Apply filter to allow developers to override the limit
-        $max_limit = apply_filters( 'lwwc_quick_select_max_limit', 20 );
-        
-        // Safety cap: never allow more than the filtered max to prevent performance issues
-        $limit = min( $limit, absint( $max_limit ) );
-        
-        // Base args for the query
-        $args = [ 
-            'posts_per_page' => $limit, 
-            'post_type' => 'shop_coupon', 
-            'post_status' => 'publish', 
-            'orderby' => 'date', 
-            'order' => 'DESC' 
-        ];
-        
-        // Add meta query based on coupon type filter
-        if ( $filter !== 'all' && $filter !== '' ) {
-            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Necessary for admin filtering
-            $args['meta_query'] = [ 
-                [ 
-                    'key' => 'discount_type', 
-                    'value' => $filter, 
-                    'compare' => '=' 
-                ] 
-            ];
-        }
-        
-        $coupons = get_posts( $args );
-        $coupon_data = [];
-        if ( ! empty( $coupons ) ) {
-            foreach ( $coupons as $coupon ) {
-                // Get the coupon type for display
-                $discount_type = get_post_meta( $coupon->ID, 'discount_type', true );
-                $type_label = '';
-                switch ( $discount_type ) {
-                    case 'percent':
-                        $type_label = __( 'Percentage', 'link-wizard-for-woocommerce' );
-                        break;
-                    case 'fixed_cart':
-                        $type_label = __( 'Fixed Cart', 'link-wizard-for-woocommerce' );
-                        break;
-                    case 'fixed_product':
-                        $type_label = __( 'Fixed Product', 'link-wizard-for-woocommerce' );
-                        break;
-                    default:
-                        $type_label = ucfirst( str_replace( '_', ' ', $discount_type ) );
-                        break;
-                }
-                
-                $coupon_data[] = [ 
-                    'id' => $coupon->ID, 
-                    'code' => $coupon->post_title,
-                    'type' => $discount_type,
-                    'type_label' => $type_label
-                ];
-            }
-        }
-        wp_send_json_success( $coupon_data );
-    }
-
-    /**
-     * AJAX handler for searching pages.
-     */
-    public function search_pages_ajax_callback() {
-        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
-        $search_term = '';
-        if ( isset( $_POST['term'] ) ) {
-            $search_term = sanitize_text_field( wp_unslash( $_POST['term'] ) );
-        }
-        if ( isset( $_POST['search_term'] ) ) {
-            $search_term = sanitize_text_field( wp_unslash( $_POST['search_term'] ) );
-        }
-        $pages = get_posts( [ 's' => $search_term, 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => 20 ] );
-        $page_data = [];
-        if ( ! empty( $pages ) ) {
-            foreach ( $pages as $page ) {
-                $page_data[] = [ 
-                    'id' => $page->ID, 
-                    'title' => $page->post_title, 
-                    'url' => get_permalink( $page->ID ),
-                    'slug' => $page->post_name
-                ];
-            }
-        }
-        wp_send_json_success( $page_data );
     }
 
     /**
@@ -1103,5 +1122,33 @@ private function get_admin_color_scheme_css() {
         } else {
             wp_send_json_error( array( 'message' => __( 'Could not create configured product.', 'link-wizard-for-woocommerce' ) ) );
         }
+    }
+
+    /**
+     * AJAX callback for searching pages (used by page search in JS)
+     */
+    public function search_pages_ajax_callback() {
+        check_ajax_referer( 'lwwc_search_nonce', 'nonce' );
+        $search_term = isset($_POST['search_term']) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : '';
+        $results = array();
+        if ( ! empty( $search_term ) ) {
+            $args = array(
+                'post_type'      => 'page',
+                'posts_per_page' => 20,
+                's'              => $search_term,
+                'post_status'    => 'publish',
+            );
+            $query = new WP_Query( $args );
+            if ( $query->have_posts() ) {
+                foreach ( $query->posts as $post ) {
+                    $results[] = array(
+                        'id'    => $post->ID,
+                        'title' => get_the_title( $post->ID ),
+                        'url'   => get_permalink( $post->ID ),
+                    );
+                }
+            }
+        }
+        wp_send_json_success( $results );
     }
 }
